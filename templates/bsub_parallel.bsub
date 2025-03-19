@@ -1,0 +1,39 @@
+#!/bin/bash
+#BSUB -q queuename
+#BSUB -J taskname
+#BSUB -o taskname.%J.out
+#BSUB -e taskname.%J.err
+#BSUB -n processers
+
+# Explanation
+# ------------
+# -q is queue name
+# -J is your job name
+# -o output file name %J is jobid in addition to jobname
+# -e error file name %J is jobid in addition to jobname
+# -n is number of processors to request
+# -M is max memory (RAM)
+# -R is requested minimum memory (RAM)
+# -W is max walltime (HH:MM) - required for long queues with no default (epistasis_long)
+
+# load modules
+# -------------
+# always good to run a purge for the job
+module purge
+module load parallel
+
+# set directory (OPTIONAL)
+WDIR="/path/to/directory"
+cd $WDIR
+
+# set number of jobs to run in parallel (should >= BSUB -n processors)
+NJOBS=8
+
+# set task script
+TASK="${WDIR}/myscript.sh"
+
+# read in arguments fromm a file
+ARGLIST="${WDIR}/mylist.txt"
+
+# run in parallel combine each subdir with outdir
+parallel -j $NJOBS -a $ARGLIST $TASK

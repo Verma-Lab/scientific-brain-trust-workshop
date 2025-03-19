@@ -1,0 +1,38 @@
+#!/bin/bash
+#BSUB -q epistasis_long
+#BSUB -J longjob
+#BSUB -o longjob.%J.out
+#BSUB -e longjob.%J.err
+#BSUB -n 1
+#BSUB -M 120000
+#BSUB -R "rusage[mem=64GB]"
+#BSUB -W 08:00
+
+# Explanation
+# ------------
+# -q is queue name
+# -J is your job name
+# -o output file name %J is jobid in addition to jobname
+# -e error file name %J is jobid in addition to jobname
+# -n is number of processors to request
+# -M is max memory (RAM)
+# -R is requested minimum memory (RAM)
+# -W is max walltime (HH:MM) - required for long queues with no default (epistasis_long)
+
+# load lpc modules
+module purge
+mofule load module1 module2
+
+# navigate to work directory
+WDIR="/project/verma_shared/projects/myproject"
+mkdir -p $WDIR
+cd $WDIR
+
+# do the thing
+echo "JOB completed"
+
+# to run this job: bsub <this_file.bsub
+# to check status: bjobs -u $USER
+
+# terminate this job at end of script
+exit 0

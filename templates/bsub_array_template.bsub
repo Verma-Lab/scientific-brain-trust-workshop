@@ -1,0 +1,45 @@
+#!/bin/bash
+#BSUB -q epistasis_normal
+#BSUB -J "jobname[1-24]"
+#BSUB -o logs/jobname.%J_%I.out
+#BSUB -e logs/jobname.%J_%I.err
+#BSUB -R "span[hosts=1]"
+#BSUB -n 1
+#BSUB -M 32000
+#BSUB -R "rusage[mem=24000]"
+#BSUB -W 8:00
+
+# load lpc modules
+module load python
+
+WDIR="/path/to/working/dir"
+cd $WDIR
+
+# Create logs directory if it doesn't exist
+mkdir -p $WDIR/logs
+
+# # Create an array File (outside the scope of this script, DO NOT RUN HERE)
+# LISTFILE="/path/to/list/of/files.txt"
+# LSFFILE="/path/to/list/of/files_manifest.txt"
+# # add line numbers
+# awk '{print NR  " " $s}' $LISTFILE > $LSFFILE
+
+# Extract the filename from manifest.txt using awk, use with LSF array
+LSFFILE="/path/to/list/of/files_manifest.txt"
+INPUT_FILE=$(awk -v i="$LSB_JOBINDEX" '$1 == i {print $2}' "$LSFFILE")
+
+# run something
+python myscript.py --input $INPUT_FILE
+
+# # To run one job in array
+# bsub -hl -J "jobname[1]" </path/to/this/file.bsub
+# # to run a few jobs in array
+# bsub -hl -J "jobname[2-5]" </path/to/this/file.bsub
+# # To run all items in array
+# bsub -hl </path/to/this/file.bsub
+
+# NOTE: You can put ANYTHING into the LSFFILE. chromosomes, list of files, 
+# prefixes, lists of anything. You can also skip the entire LSFFILE creation
+# and just create the array in this file if it can use numbers. Like
+# LSFARRAY=(1..5)
+# then just use $LSB_JOBINDEX
